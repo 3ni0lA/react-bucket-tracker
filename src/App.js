@@ -1,23 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import BucketList from "./BucketList";
 
 function App() {
+  // Load theme from localStorage or default to light mode
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  // Toggle between dark and light mode
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem("theme", newMode ? "dark" : "light");
+  };
+
+  useEffect(() => {
+    document.body.className = darkMode ? "dark-mode" : "light-mode";
+  }, [darkMode]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={`app-container ${darkMode ? "dark" : ""}`}>
+      <button className="toggle-btn" onClick={toggleDarkMode}>
+        {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
+      </button>
+      <h1>Bucket List Tracker</h1>
+      <p>Track and achieve your life goals, one step at a time.</p>
+      <BucketList />
     </div>
   );
 }
