@@ -1,32 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { API } from "aws-amplify";
+import { listBucketListItems } from "./graphql/queries";
+import { createBucketListItem, deleteBucketListItem } from "./graphql/mutations";
 import "./BucketList.css";
 
 function BucketList() {
-  const [items, setItems] = useState(["Travel to Japan", "Skydiving", "Learn AWS"]);
-  const [newItem, setNewItem] = useState("");
+  const [items, setItems] = useState([]); // ✅ Store bucket list items from DB
+  const [newItem, setNewItem] = useState(""); // ✅ Store new input value
 
-  // Function to add a new item to the list
-  const addItem = () => {
-    if (newItem.trim() !== "") {
-      setItems([...items, newItem]);
-      setNewItem(""); // Clear input after adding
+  // ✅ Fetch items from DynamoDB when the component mounts
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const fetchItems = async () => {
+    try {
+      const result = await API.graphql({ query: listBucketListItems });
+      setItems(result.data.listBucketListItems.items); // ✅ Store fetched data
+    } catch (error) {
+      console.error("Error fetching items:", error);
     }
   };
 
-  // Function to delete an item from the list
-  const deleteItem = (index) => {
-    const updatedItems = items.filter((_, i) => i !== index);
-    setItems(updatedItems);
+  // ✅ Save new item to DynamoDB
+  const addItem = async () => {
+    if (!newItem.trim()) return; // Prevent empty input
+
+    const item = { name: newItem, completed: false };
+
+    try {
+      const result = await API.graphql({
+        query: createBucketListItem,
+        variables: { input: item },
+      });
+
+      setItems([...items, result.data.createBucketListItem]); // ✅ Add to UI
+      setNewItem(""); // ✅ Clear input field
+    } catch (error) {
+      console.error("Error adding item:", error);
+    }
+  };
+
+  // ✅ Delete item from DynamoDB
+  const deleteItem = async (id) => {
+    try {
+      await API.graphql({
+        query: deleteBucketListItem,
+        variables: { input: { id } },
+      });
+
+      setItems(items.filter((item) => item.id !== id)); // ✅ Remove from UI
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
 
   return (
     <div className="bucket-list-container">
       <h2>My Bucket List</h2>
       <ul>
-        {items.map((item, index) => (
-          <li key={index}>
-            {item}
-            <button className="delete-btn" onClick={() => deleteItem(index)}>❌</button>
+        {items.map((item) => (
+          <li key={item.id}>
+            {item.name}
+            <button className="delete-btn" onClick={() => deleteItem(item.id)}>❌</button>
           </li>
         ))}
       </ul>
