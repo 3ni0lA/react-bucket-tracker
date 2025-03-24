@@ -1,0 +1,10 @@
+{
+  "resourceName": "reactdynamo",
+  "tableName": "app",
+  "partitionKey": {
+    "fieldName": "bucketlist",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

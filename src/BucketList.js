@@ -1,59 +1,49 @@
 import React, { useState, useEffect } from "react";
-import { API } from "aws-amplify";
-import { listBucketListItems } from "./graphql/queries";
-import { createBucketListItem, deleteBucketListItem } from "./graphql/mutations";
+import { Amplify } from "aws-amplify";
+import { GraphQLAPI, graphqlOperation } from "@aws-amplify/api-graphql"; // ✅ Corrected import
+import awsconfig from "./aws-exports";
+import * as queries from "./graphql/queries.ts";
+import * as mutations from "./graphql/mutations.ts";
 import "./BucketList.css";
 
-function BucketList() {
-  const [items, setItems] = useState([]); // ✅ Store bucket list items from DB
-  const [newItem, setNewItem] = useState(""); // ✅ Store new input value
+Amplify.configure(awsconfig);
 
-  // ✅ Fetch items from DynamoDB when the component mounts
-  useEffect(() => {
-    fetchItems();
-  }, []);
+function BucketList() {
+  const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
 
   const fetchItems = async () => {
     try {
-      const result = await API.graphql({ query: listBucketListItems });
-      setItems(result.data.listBucketListItems.items); // ✅ Store fetched data
+      const result = await GraphQLAPI.graphql(graphqlOperation(queries.listBucketListItems));
+      setItems(result.data.listBucketListItems.items);
     } catch (error) {
       console.error("Error fetching items:", error);
     }
   };
 
-  // ✅ Save new item to DynamoDB
   const addItem = async () => {
-    if (!newItem.trim()) return; // Prevent empty input
-
-    const item = { name: newItem, completed: false };
-
+    if (newItem.trim() === "") return;
     try {
-      const result = await API.graphql({
-        query: createBucketListItem,
-        variables: { input: item },
-      });
-
-      setItems([...items, result.data.createBucketListItem]); // ✅ Add to UI
-      setNewItem(""); // ✅ Clear input field
+      await GraphQLAPI.graphql(graphqlOperation(mutations.createBucketListItem, { input: { name: newItem } }));
+      setNewItem("");
+      fetchItems();
     } catch (error) {
       console.error("Error adding item:", error);
     }
   };
 
-  // ✅ Delete item from DynamoDB
   const deleteItem = async (id) => {
     try {
-      await API.graphql({
-        query: deleteBucketListItem,
-        variables: { input: { id } },
-      });
-
-      setItems(items.filter((item) => item.id !== id)); // ✅ Remove from UI
+      await GraphQLAPI.graphql(graphqlOperation(mutations.deleteBucketListItem, { input: { id } }));
+      fetchItems();
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
   return (
     <div className="bucket-list-container">

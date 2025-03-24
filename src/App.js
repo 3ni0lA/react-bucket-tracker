@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import "@aws-amplify/ui-react/styles.css";
+import { Button, View, withAuthenticator } from "@aws-amplify/ui-react";
+import { Amplify } from "aws-amplify";
+import awsExports from "./aws-exports";
 import BucketList from "./BucketList";
 
-function App() {
+// Configure AWS Amplify
+Amplify.configure(awsExports);
+
+function App({ signOut }) {
   // Load theme from localStorage or default to light mode
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
@@ -20,15 +27,22 @@ function App() {
   }, [darkMode]);
 
   return (
-    <div className={`app-container ${darkMode ? "dark" : ""}`}>
+    <View className={`app-container ${darkMode ? "dark" : ""}`}>
       <button className="toggle-btn" onClick={toggleDarkMode}>
         {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
       </button>
       <h1>Bucket List Tracker</h1>
       <p>Track and achieve your life goals, one step at a time.</p>
+
+      {/* Sign Out Button */}
+      <Button onClick={signOut} variation="primary">
+        Sign Out
+      </Button>
+
+      {/* Bucket List Component */}
       <BucketList />
-    </div>
+    </View>
   );
 }
 
-export default App;
+export default withAuthenticator(App);
