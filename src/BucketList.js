@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Amplify } from "aws-amplify";
-import { API, graphqlOperation } from "aws-amplify";// ✅ Corrected import
+import { GraphQLAPI, graphqlOperation } from "@aws-amplify/api-graphql"; // ✅ Corrected import
 import awsconfig from "./aws-exports";
 import * as queries from "./graphql/queries.ts";
 import * as mutations from "./graphql/mutations.ts";
@@ -14,7 +14,7 @@ function BucketList() {
 
   const fetchItems = async () => {
     try {
-      const result = await await API.graphql(graphqlOperation(queries.listBucketListItems));
+      const result = await GraphQLAPI.graphql(graphqlOperation(queries.listBucketListItems));
       setItems(result.data.listBucketListItems.items);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -24,7 +24,7 @@ function BucketList() {
   const addItem = async () => {
     if (newItem.trim() === "") return;
     try {
-      await API.graphql(graphqlOperation(mutations.createBucketListItem, { input: { name: newItem } }));
+      await GraphQLAPI.graphql(graphqlOperation(mutations.createBucketListItem, { input: { name: newItem } }));
       setNewItem("");
       fetchItems();
     } catch (error) {
@@ -34,7 +34,7 @@ function BucketList() {
 
   const deleteItem = async (id) => {
     try {
-      await API.graphql(graphqlOperation(mutations.deleteBucketListItem, { input: { id } }));
+      await GraphQLAPI.graphql(graphqlOperation(mutations.deleteBucketListItem, { input: { id } }));
       fetchItems();
     } catch (error) {
       console.error("Error deleting item:", error);
