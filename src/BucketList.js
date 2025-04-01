@@ -22,11 +22,22 @@ function BucketList() {
   };
 
   const addItem = async () => {
-    if (newItem.trim() === "") return;
+    if (!newItem.trim()) {
+      console.log("Input is empty");
+      return;
+    }
+
+    const item = { name: newItem, completed: false };
+
     try {
-      await GraphQLAPI.graphql(graphqlOperation(mutations.createBucketListItem, { input: { name: newItem } }));
-      setNewItem("");
-      fetchItems();
+      const result = await GraphQLAPI.graphql(graphqlOperation(mutations.createBucketListItem, { input: item }));
+      console.log("Item added:", result.data.createBucketListItem);
+      setItems((prevItems) => {
+        const updatedItems = [...prevItems, result.data.createBucketListItem];
+        console.log("Updated items:", updatedItems);
+        return updatedItems;
+      });
+      setNewItem(""); // Clear the input field
     } catch (error) {
       console.error("Error adding item:", error);
     }
@@ -44,6 +55,10 @@ function BucketList() {
   useEffect(() => {
     fetchItems();
   }, []);
+
+  useEffect(() => {
+    console.log("Current items:", items);
+  }, [items]);
 
   return (
     <div className="bucket-list-container">
