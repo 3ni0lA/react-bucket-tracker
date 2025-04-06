@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Amplify } from "aws-amplify";
 import { GraphQLAPI, graphqlOperation } from "@aws-amplify/api-graphql"; // ✅ Corrected import
+console.log("AWS Amplify imports loaded");
 import awsconfig from "./aws-exports";
 import * as queries from "./graphql/queries.ts";
 import * as mutations from "./graphql/mutations.ts";
 import "./BucketList.css";
 
-Amplify.configure(awsconfig);
-
+try {
+  console.log("Configuring Amplify with config:", JSON.stringify(awsconfig, null, 2));
+  Amplify.configure(awsconfig);
+  console.log("Amplify configuration successful");
+} catch (error) {
+  console.error("Error configuring Amplify:", error);
+}
 function BucketList() {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState("");
@@ -22,24 +28,36 @@ function BucketList() {
   };
 
   const addItem = async () => {
+    console.log("addItem function called");
     if (!newItem.trim()) {
       console.log("Input is empty");
       return;
     }
 
+    console.log("Creating new item with value:", newItem);
     const item = { name: newItem, completed: false };
+    console.log("Item object created:", item);
 
     try {
+      console.log("Attempting GraphQL mutation with operation:", mutations.createBucketListItem);
+      console.log("GraphQL operation parameters:", { input: item });
       const result = await GraphQLAPI.graphql(graphqlOperation(mutations.createBucketListItem, { input: item }));
+      console.log("GraphQL mutation successful, result:", result);
       console.log("Item added:", result.data.createBucketListItem);
       setItems((prevItems) => {
+        console.log("Previous items:", prevItems);
         const updatedItems = [...prevItems, result.data.createBucketListItem];
         console.log("Updated items:", updatedItems);
         return updatedItems;
       });
+      console.log("Clearing input field");
       setNewItem(""); // Clear the input field
     } catch (error) {
       console.error("Error adding item:", error);
+      console.error("Error details:", error.message);
+      if (error.errors) {
+        console.error("GraphQL errors:", error.errors);
+      }
     }
   };
 
@@ -76,9 +94,25 @@ function BucketList() {
           type="text"
           placeholder="Add a new goal..."
           value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
+          onChange={(e) => {
+            console.log("Input value changed:", e.target.value);
+            setNewItem(e.target.value);
+          }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              console.log("Enter key pressed in input field");
+              addItem();
+            }
+          }}
         />
-        <button onClick={addItem}>Add</button>
+        <button 
+          onClick={() => {
+            console.log("Add button clicked");
+            addItem();
+          }}
+        >
+          Add
+        </button>
       </div>
     </div>
   );
