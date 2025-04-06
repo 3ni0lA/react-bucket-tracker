@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
-import { Button, View, withAuthenticator } from "@aws-amplify/ui-react";
+import { Button, View, withAuthenticator, WithAuthenticatorProps } from "@aws-amplify/ui-react";
 import { Amplify } from "aws-amplify";
 import awsExports from "./aws-exports";
 import BucketList from "./BucketList";
@@ -9,14 +9,14 @@ import BucketList from "./BucketList";
 // Configure AWS Amplify
 Amplify.configure(awsExports);
 
-function App({ signOut }) {
+function App({ signOut }: WithAuthenticatorProps): React.ReactElement {
   // Load theme from localStorage or default to light mode
-  const [darkMode, setDarkMode] = useState(() => {
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem("theme") === "dark";
   });
 
   // Toggle between dark and light mode
-  const toggleDarkMode = () => {
+  const toggleDarkMode = (): void => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     localStorage.setItem("theme", newMode ? "dark" : "light");
@@ -46,3 +46,4 @@ function App({ signOut }) {
 }
 
 export default withAuthenticator(App);
+
