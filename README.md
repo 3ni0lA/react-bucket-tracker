@@ -20,13 +20,24 @@ A simple, full-stack application that allows users to track and manage their lif
 
 ## Screenshots
 
-*(Add screenshots or a short Loom/YouTube video demo if available)*
+### Home Page (Light Mode)
+![Light Mode Screenshot](https://github.com/3ni0lA/react-bucket-tracker/blob/main/light%20mode.png?raw=true
+)
+
+### Home Page (Dark Mode)
+![Dark Mode Screenshot](https://github.com/3ni0lA/react-bucket-tracker/blob/main/Dark%20mode.png?raw=true)
+
+### Architecture Diagram
+![Architecture Screenshot](https://github.com/3ni0lA/react-bucket-tracker/blob/main/App%20architecture.png?raw=true)
+
+
+
 
 ## Setup Instructions
 
 1. Clone this repo:
    ```bash
-   git clone https://github.com/yourusername/bucket-list-tracker.git
+   git clone https://github.com/3nioLA/bucket-list-tracker.git
    cd bucket-list-tracker
    ```
 
@@ -60,6 +71,9 @@ A simple, full-stack application that allows users to track and manage their lif
 - Add categories/tags for goals
 - Enable file upload for media-based goals (using S3)
 - Implement progress tracking (e.g., goal completion percentage)
+  
+## Full Documentation Link  
+[Notion Doc](https://www.notion.so/Building-a-Bucket-list-tracker-and-deploying-to-AWS-Amplify-1d0b7457f77b809ca4b5e90d8fd4a6e3?pvs=4)
 
 ## Author
 
