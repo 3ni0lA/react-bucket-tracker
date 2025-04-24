@@ -37,7 +37,7 @@ A simple, full-stack application that allows users to track and manage their lif
 
 1. Clone this repo:
    ```bash
-   git clone https://github.com/3ni0lA/react-bucket-tracker.git)
+   git clone https://github.com/3ni0lA/react-bucket-tracker.git
    cd bucket-list-tracker
    ```
 
